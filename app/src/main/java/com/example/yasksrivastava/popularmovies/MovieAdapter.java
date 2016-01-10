@@ -6,7 +6,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
-import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 
@@ -33,8 +32,7 @@ public class MovieAdapter extends ArrayAdapter<PopularMovie>  {
         ImageView iconView = (ImageView) convertView.findViewById(R.id.movie_icon);
        // iconView.setImageResource(movie.image);
         Picasso.with(getContext()).load(movie.imgurl).into(iconView);
-        TextView versionNameView = (TextView) convertView.findViewById(R.id.movie_name);
-        versionNameView.setText(movie.title);
+
 
 
         return convertView;

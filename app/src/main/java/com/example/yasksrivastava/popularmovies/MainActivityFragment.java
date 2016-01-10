@@ -1,13 +1,17 @@
 package com.example.yasksrivastava.popularmovies;
 
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ListView;
+import android.widget.AdapterView;
+import android.widget.GridView;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -26,10 +30,22 @@ import java.util.Arrays;
  */
 public class MainActivityFragment extends Fragment {
     private MovieAdapter movieAdapter;
-    ListView listview;
+    GridView gridview;
     public MainActivityFragment() {
     }
 
+    @Override
+    public void onStart(){
+
+        super.onStart();
+
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        String order = prefs.getString("sort_order", "");
+        Log.v("Selected settings = ",order);
+        FetchMovieData movieTask = new FetchMovieData();
+        movieTask.execute(order);
+
+    }
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -40,34 +56,54 @@ public class MainActivityFragment extends Fragment {
 
         movieAdapter = new MovieAdapter(getActivity(), Arrays.asList(movies_data));
 
-        listview = (ListView)rootview.findViewById(R.id.movie_listview);
-        listview.setAdapter(movieAdapter);
-        FetchMovieData movieTask = new FetchMovieData();
-        movieTask.execute();
+        gridview = (GridView)rootview.findViewById(R.id.movie_listview);
+        gridview.setAdapter(movieAdapter);
+
+        gridview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+                PopularMovie detail_movie = movieAdapter.getItem(position);
+                Intent intent = new Intent(getActivity(), Main2Activity.class);
+                Bundle extras = new Bundle();
+                extras.putString("detailTitle", detail_movie.title);
+                extras.putString("detaiImgurl", detail_movie.imgurl);
+                intent.putExtras(extras);
+                startActivity(intent);
+
+            }
+        });
+
 
         return rootview;
     }
 
-    public class FetchMovieData extends AsyncTask<Void,Void,PopularMovie[]>{
+    public class FetchMovieData extends AsyncTask<String,Void,PopularMovie[]>{
 
         @Override
         protected void onPostExecute(PopularMovie[] finalresult) {
             Log.v("on POST EXEC","Running");
             movieAdapter = new MovieAdapter(getActivity(), Arrays.asList(finalresult));
             movieAdapter.notifyDataSetChanged();
-            listview.setAdapter(movieAdapter);
-            Log.v("TESSS",finalresult[0].imgurl);
+            gridview.setAdapter(movieAdapter);
         }
 
         @Override
-        protected PopularMovie[] doInBackground(Void... params ){
+        protected PopularMovie[] doInBackground(String... params ){
             HttpURLConnection urlConnection = null;
             BufferedReader reader = null;
             String forecastJsonStr = null;
             PopularMovie result[] = new PopularMovie[20];
             try {
-
-                URL url = new URL("http://api.themoviedb.org/3/discover/movie?sort_by=popularity.desc&api_key=05df3644ee3e75b407700ca976b07874");
+                //vote_count
+                String selected_option = params[0];
+                Log.e("Selected OPtion was",selected_option);
+                if (selected_option.equals("popular")){
+                    selected_option="popularity";
+                }
+                else{
+                    selected_option="vote_count";
+                }
+                URL url = new URL("http://api.themoviedb.org/3/discover/movie?sort_by="+selected_option+".desc&api_key=05df3644ee3e75b407700ca976b07874");
 
                 urlConnection = (HttpURLConnection) url.openConnection();
                 urlConnection.setRequestMethod("GET");

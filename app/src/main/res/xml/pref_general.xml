@@ -1,0 +1,17 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+
+
+    <!-- NOTE: EditTextPreference accepts EditText attributes. -->
+    <!-- NOTE: EditTextPreference's summary should be set to its value by the activity code. -->
+
+    <ListPreference
+        android:key="sort_order"
+        android:title="Movie list sort order"
+        android:dialogTitle="@string/sort_movies_by"
+        android:entries="@array/pref_sort_order_titles"
+        android:entryValues="@array/pref_sort_order_values"
+        android:summary="%s"
+        />
+
+</PreferenceScreen>
