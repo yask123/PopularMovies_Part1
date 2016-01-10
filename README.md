@@ -6,10 +6,7 @@ Screenshot:
 
 
 <img src="http://i.imgur.com/JXEdcPX.jpg" height="400">
-
 <img src="http://i.imgur.com/NQYqiTY.jpg" height="400">
-
-
 <img src="http://i.imgur.com/zuyCJGS.png" height="400">
 
 
