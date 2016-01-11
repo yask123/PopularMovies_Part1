@@ -20,3 +20,8 @@ Screenshot:
 3. ~~UI improvements~~
 4. ~~More details in detail view~~
 5. Animaitons
+
+## API key
+You would need to manually add your key here:
+https://github.com/yask123/PopularMovies_Part1/blob/master/app/src/main/java/com/example/yasksrivastava/popularmovies/MainActivityFragment.java#L108
+
