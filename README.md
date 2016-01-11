@@ -2,6 +2,10 @@
 
 An app to display Popular Movies
 
+
+<img src="https://media.giphy.com/media/whmc3spBkphaU/giphy.gif" height="400">
+
+
 Screenshot:
 
 <img src="http://i.imgur.com/JXEdcPX.jpg" height="400">
