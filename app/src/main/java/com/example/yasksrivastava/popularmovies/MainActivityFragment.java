@@ -2,6 +2,7 @@ package com.example.yasksrivastava.popularmovies;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -41,7 +42,7 @@ public class MainActivityFragment extends Fragment {
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
         String order = prefs.getString("sort_order", "");
-        Log.v("Selected settings = ",order);
+        Log.v("Selected settings = ", order);
         FetchMovieData movieTask = new FetchMovieData();
         movieTask.execute(order);
 
@@ -51,8 +52,7 @@ public class MainActivityFragment extends Fragment {
                              Bundle savedInstanceState) {
         View rootview = inflater.inflate(R.layout.fragment_main, container, false);
 
-        PopularMovie movies_data[]={new PopularMovie("SpierMan","http://image.tmdb.org/t/p/w185//nBNZadXqJSdt05SHLqgT0HuC5Gm.jpg")
-        };
+        PopularMovie movies_data[]={};
 
         movieAdapter = new MovieAdapter(getActivity(), Arrays.asList(movies_data));
 
@@ -67,6 +67,9 @@ public class MainActivityFragment extends Fragment {
                 Bundle extras = new Bundle();
                 extras.putString("detailTitle", detail_movie.title);
                 extras.putString("detaiImgurl", detail_movie.imgurl);
+                extras.putString("detaildate",detail_movie.releaseDate);
+                extras.putString("detailvotes",String.valueOf(detail_movie.vote_avg));
+                extras.putString("detailsummary",detail_movie.overview);
                 intent.putExtras(extras);
                 startActivity(intent);
 
@@ -81,7 +84,6 @@ public class MainActivityFragment extends Fragment {
 
         @Override
         protected void onPostExecute(PopularMovie[] finalresult) {
-            Log.v("on POST EXEC","Running");
             movieAdapter = new MovieAdapter(getActivity(), Arrays.asList(finalresult));
             movieAdapter.notifyDataSetChanged();
             gridview.setAdapter(movieAdapter);
@@ -96,14 +98,21 @@ public class MainActivityFragment extends Fragment {
             try {
                 //vote_count
                 String selected_option = params[0];
-                Log.e("Selected OPtion was",selected_option);
                 if (selected_option.equals("popular")){
                     selected_option="popularity";
                 }
                 else{
                     selected_option="vote_count";
                 }
-                URL url = new URL("http://api.themoviedb.org/3/discover/movie?sort_by="+selected_option+".desc&api_key=05df3644ee3e75b407700ca976b07874");
+                final String BASE_URL = "http://api.themoviedb.org/3/discover/movie";
+                final  String key = "";
+
+                Uri builtUri = Uri.parse(BASE_URL).buildUpon()
+                        .appendQueryParameter("sort_by", selected_option+".desc")
+                        .appendQueryParameter("api_key", key)
+                        .build();
+                Log.e("Url may be ",builtUri.toString());
+                URL url = new URL(builtUri.toString());
 
                 urlConnection = (HttpURLConnection) url.openConnection();
                 urlConnection.setRequestMethod("GET");
@@ -131,8 +140,16 @@ public class MainActivityFragment extends Fragment {
                     JSONArray getresults = moviejson.getJSONArray("results");
 
                     for(int i = 0;i<getresults.length();i++){
-                        Log.v("not final",getresults.getJSONObject(i).getString("original_title"));
-                        result[i]= new PopularMovie(getresults.getJSONObject(i).getString("original_title"),"http://image.tmdb.org/t/p/w185/"+getresults.getJSONObject(i).getString("poster_path"));
+
+
+                        String temp_title = getresults.getJSONObject(i).getString("original_title");
+                        String temp_imgurl = "http://image.tmdb.org/t/p/w185/"+getresults.getJSONObject(i).getString("poster_path");
+                        String temp_release_data=getresults.getJSONObject(i).getString("release_date");
+                        double temp_voteavg = getresults.getJSONObject(i).getDouble("vote_average");
+                        String temp_overview = getresults.getJSONObject(i).getString("overview");
+                        result[i]= new PopularMovie(temp_title,temp_imgurl,temp_release_data,temp_voteavg,temp_overview);
+
+                        Log.v("not final",temp_imgurl);
 
                     }
                     Log.v("Return Result",result[0].title);
@@ -143,7 +160,7 @@ public class MainActivityFragment extends Fragment {
 
             } catch (IOException e) {
                 Log.e("PlaceholderFragment", "Error ", e);
-                return  null;
+                return  result;
             } finally{
                 if (urlConnection != null) {
                     urlConnection.disconnect();

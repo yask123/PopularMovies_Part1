@@ -1,6 +1,7 @@
 package com.example.yasksrivastava.popularmovies;
 
 import android.app.Activity;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,9 +31,12 @@ public class MovieAdapter extends ArrayAdapter<PopularMovie>  {
         }
 
         ImageView iconView = (ImageView) convertView.findViewById(R.id.movie_icon);
-       // iconView.setImageResource(movie.image);
-        Picasso.with(getContext()).load(movie.imgurl).into(iconView);
-
+        try{
+            Picasso.with(getContext()).load(movie.imgurl).into(iconView);
+        }
+        catch (Exception e){
+            Log.e("Err","Cant load image");
+        }
 
 
         return convertView;
