@@ -35,7 +35,7 @@ public class MovieAdapter extends ArrayAdapter<PopularMovie>  {
             Picasso.with(getContext()).load(movie.imgurl).into(iconView);
         }
         catch (Exception e){
-            Log.e("Err","Cant load image");
+            Log.e("Err", "Cant load images");
         }
 
 
